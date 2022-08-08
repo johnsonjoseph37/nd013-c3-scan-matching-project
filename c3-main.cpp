@@ -27,7 +27,7 @@ using namespace std;
 #include <pcl/io/pcd_io.h>
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/filters/voxel_grid.h>
-#include "p4-helper.h"
+#include "helper.h"
 #include <sstream>
 #include <chrono> 
 #include <ctime> 
@@ -279,10 +279,11 @@ int main(){
 			
 			//======================================
 			// A - ICP 
-			//scan_transform = ICP(mapCloud, cloudFiltered, pose, 3);
-			//pose = getPose(scan_transform);
+			pose = Pose(Point(vehicle->GetTransform().location.x, vehicle->GetTransform().location.y, vehicle->GetTransform().location.z), Rotate(vehicle->GetTransform().rotation.yaw * pi/180, vehicle->GetTransform().rotation.pitch * pi/180, vehicle->GetTransform().rotation.roll * pi/180)) - poseRef;
+			scan_transform = ICP(mapCloud, cloudFiltered, pose, 3);
+			pose = getPose(scan_transform);
 
-			//pcl::transformPointCloud(*cloudFiltered, *transformed_scan, scan_transform);
+			pcl::transformPointCloud(*cloudFiltered, *transformed_scan, scan_transform);
 			// A - ICP
 			//======================================
 
@@ -294,6 +295,7 @@ int main(){
 			ndt.setResolution(1);
 			ndt.setInputTarget(mapCloud);
 			
+			pose = Pose(Point(vehicle->GetTransform().location.x, vehicle->GetTransform().location.y, vehicle->GetTransform().location.z), Rotate(vehicle->GetTransform().rotation.yaw * pi / 180, vehicle->GetTransform().rotation.pitch * pi / 180, vehicle->GetTransform().rotation.roll * pi / 180)) - poseRef;
 			scan_transform = NDT(ndt, cloudFiltered, pose, 3);
 			pose = getPose(scan_transform);
 
